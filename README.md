@@ -12,7 +12,3 @@ student at 42 and esgi, apprentice dev at a startup at station f.
 
 most of my code is written with claude code. i do the architecture, the big decisions, the ui and the users.
 the drone and the runtime are the exception: i write that c myself.
-
-## elsewhere
-
-x [@lystriq](https://x.com/lystriq) · threads [@lystriq](https://www.threads.com/@lystriq)
