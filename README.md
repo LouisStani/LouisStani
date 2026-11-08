@@ -1,1 +1,1 @@
-<img src="assets/profile.svg" alt="lystriq: i build clean tools, games and apps that work and that people use. now: sixmonths (ai startup, station f), esgi work-study, 42 paris common core. projects: claude-accounts (live), drone (step 0)." width="100%">
+<img src="assets/profile.svg" alt="lystriq: i build clean tools, games and apps that work and that people use. now: sixmonths (ai startup, station f), esgi work-study, 42 paris common core. projects: kindric (v0.5.0)." width="100%">
