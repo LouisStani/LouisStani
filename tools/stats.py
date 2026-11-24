@@ -74,17 +74,22 @@ def parse_time(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
+def earliest_date(user: dict) -> datetime:
+    """Earliest of account creation and repository creation."""
+    return min([parse_time(user["createdAt"])] + [parse_time(n["createdAt"]) for n in user["repositories"]["nodes"]])
+
+
 def experience_score(user: dict, now: datetime) -> int:
-    """Days since the earliest of account and repository creation, divided by 100."""
-    earliest = min([parse_time(user["createdAt"])] + [parse_time(n["createdAt"]) for n in user["repositories"]["nodes"]])
-    return math.floor((now - earliest).total_seconds() / 86400 / 100)
+    """Days since the earliest date, divided by 100."""
+    return math.floor((now - earliest_date(user)).total_seconds() / 86400 / 100)
 
 
-def ranked(name: str, score: int, table: list[tuple[str, str, int]]) -> dict:
+def ranked(name: str, score: int, table: list[tuple[str, str, int]], value: str) -> dict:
+    """Trophy as the profile shows it; `value` is the number behind it, written for people."""
     for rank, title, minimum in table:
         if score >= minimum:
-            return {"rank": rank, "name": name, "title": title}
-    return {"rank": "?", "name": name, "title": "not yet"}
+            return {"rank": rank, "name": name, "title": title, "value": value}
+    return {"rank": "?", "name": name, "title": "not yet", "value": value}
 
 
 def build_stats(data: dict, now: datetime) -> tuple[dict, dict]:
@@ -98,9 +103,16 @@ def build_stats(data: dict, now: datetime) -> tuple[dict, dict]:
         "repositories": user["repositories"]["totalCount"],
     }
     tables = {"commits": COMMITS, "experience": EXPERIENCE, "pull requests": PULL_REQUESTS, "repositories": REPOSITORIES}
+    # Commit contributions cover the last 12 months (GitHub's default window).
+    values = {
+        "commits": f"{scores['commits']:,} in 12 months",
+        "experience": f"since {earliest_date(user).year}",
+        "pull requests": f"{scores['pull requests']:,} opened",
+        "repositories": f"{scores['repositories']:,} owned",
+    }
     releases = {repo: data[f"r{i}"]["latestRelease"]["tagName"]
                 for i, repo in enumerate(RELEASE_REPOS) if data[f"r{i}"] and data[f"r{i}"]["latestRelease"]}
-    return {"releases": releases, "trophies": [ranked(name, scores[name], tables[name]) for name in tables]}, scores
+    return {"releases": releases, "trophies": [ranked(name, scores[name], tables[name], values[name]) for name in tables]}, scores
 
 
 def main() -> None:

@@ -145,9 +145,10 @@ def trophies(fonts: Fonts, y: float, earned: list[dict]) -> str:
     plank = (f'<rect x="{left + SHADOW}" y="{shelf + SHADOW}" width="{right - left}" height="{PLANK}" rx="6" fill="{INK}"/>'
              f'<rect x="{left}" y="{shelf}" width="{right - left}" height="{PLANK}" rx="6" fill="{TERM_BAR}" stroke="{INK}" stroke-width="{STROKE}"/>')
     cups = "".join(trophy(fonts, t["rank"], t["name"], MARGIN + step * (i + 0.5), shelf) for i, t in enumerate(earned))
-    titles = "".join(centered(fonts.regular, t["title"], MARGIN + step * (i + 0.5), shelf + PLANK + 42, 18, MUTED)
-                     for i, t in enumerate(earned))
-    return plank + cups + titles
+    captions = "".join(centered(fonts.bold, t["value"], MARGIN + step * (i + 0.5), shelf + PLANK + 44, 21, PAPER)
+                       + centered(fonts.regular, t["title"], MARGIN + step * (i + 0.5), shelf + PLANK + 72, 17, MUTED)
+                       for i, t in enumerate(earned))
+    return plank + cups + captions
 
 
 def logo(path: Path, x: float, y: float, size: float) -> str:
@@ -199,8 +200,8 @@ def build_trophies(stats: dict) -> str:
     """Bottom panel: the trophy shelf, a separate image so it can link elsewhere."""
     fonts = Fonts()
     parts = [separator(fonts, "trophies", 70), trophies(fonts, 146, stats["trophies"])]
-    label = "trophies: " + ", ".join(f"{t['name']} {t['rank']} ({t['title']})" for t in stats["trophies"]) + "."
-    return panel(parts, 146 + SHELF_TOP + PLANK + 80, label, top_gap=PANEL_GAP)
+    label = "trophies: " + ", ".join(f"{t['name']} {t['rank']} ({t['title']}, {t['value']})" for t in stats["trophies"]) + "."
+    return panel(parts, 146 + SHELF_TOP + PLANK + 106, label, top_gap=PANEL_GAP)
 
 
 def main() -> None:

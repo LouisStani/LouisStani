@@ -6,22 +6,26 @@
     {
       "rank": "S",
       "name": "commits",
-      "title": "super committer"
+      "title": "super committer",
+      "value": "1,190 in 12 months"
     },
     {
       "rank": "A",
       "name": "experience",
-      "title": "intermediate dev"
+      "title": "intermediate dev",
+      "value": "since 2022"
     },
     {
       "rank": "AAA",
       "name": "pull requests",
-      "title": "ultra puller"
+      "title": "ultra puller",
+      "value": "126 opened"
     },
     {
       "rank": "B",
       "name": "repositories",
-      "title": "middle repo creator"
+      "title": "middle repo creator",
+      "value": "17 owned"
     }
   ]
 }

@@ -6,13 +6,14 @@ from stats import COMMITS, EXPERIENCE, PULL_REQUESTS, REPOSITORIES, build_stats,
 
 
 def test_rank_uses_the_best_threshold_reached() -> None:
-    assert ranked("commits", 1000, COMMITS)["rank"] == "S"
-    assert ranked("commits", 999, COMMITS)["rank"] == "AAA"
-    assert ranked("pull requests", 9, PULL_REQUESTS) == {"rank": "C", "name": "pull requests", "title": "first pull"}
+    assert ranked("commits", 1000, COMMITS, "")["rank"] == "S"
+    assert ranked("commits", 999, COMMITS, "")["rank"] == "AAA"
+    assert ranked("pull requests", 9, PULL_REQUESTS, "9 opened") == {
+        "rank": "C", "name": "pull requests", "title": "first pull", "value": "9 opened"}
 
 
 def test_rank_is_unknown_below_the_lowest_threshold() -> None:
-    assert ranked("repositories", 0, REPOSITORIES)["rank"] == "?"
+    assert ranked("repositories", 0, REPOSITORIES, "0 owned")["rank"] == "?"
 
 
 def test_experience_is_days_over_100_from_the_earliest_date() -> None:
@@ -20,7 +21,7 @@ def test_experience_is_days_over_100_from_the_earliest_date() -> None:
     user = {"createdAt": "2023-01-01T00:00:00Z", "repositories": {"nodes": [{"createdAt": "2022-01-01T00:00:00Z"}]}}
     # 2022-01-01 to 2026-01-01 is 1461 days.
     assert experience_score(user, now) == 14
-    assert ranked("experience", 14, EXPERIENCE)["title"] == "intermediate dev"
+    assert ranked("experience", 14, EXPERIENCE, "")["title"] == "intermediate dev"
 
 
 def test_build_stats_adds_private_commits_and_skips_missing_releases() -> None:
@@ -36,4 +37,5 @@ def test_build_stats_adds_private_commits_and_skips_missing_releases() -> None:
     stats, scores = build_stats(data, datetime(2026, 1, 1, tzinfo=timezone.utc))
     assert scores["commits"] == 1100
     assert stats["releases"] == {}
-    assert [t["rank"] for t in stats["trophies"]] == ["S", "C", "C", "C"]  # experience: 365 days -> 3, C from 2
+    assert [t["rank"] for t in stats["trophies"]] == ["S", "C", "C", "C"]
+    assert [t["value"] for t in stats["trophies"]] == ["1,100 in 12 months", "since 2025", "9 opened", "3 owned"]  # experience: 365 days -> 3, C from 2
