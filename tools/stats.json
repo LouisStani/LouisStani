@@ -1,0 +1,27 @@
+{
+  "releases": {
+    "kindric": "v0.5.0"
+  },
+  "trophies": [
+    {
+      "rank": "S",
+      "name": "commits",
+      "title": "super committer"
+    },
+    {
+      "rank": "A",
+      "name": "experience",
+      "title": "intermediate dev"
+    },
+    {
+      "rank": "AAA",
+      "name": "pull requests",
+      "title": "ultra puller"
+    },
+    {
+      "rank": "B",
+      "name": "repositories",
+      "title": "middle repo creator"
+    }
+  ]
+}
