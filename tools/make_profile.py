@@ -1,4 +1,4 @@
-"""Generate the whole profile README as one SVG: banner, projects and trophies.
+"""Generate the profile README images: banner and projects, then trophies.
 
 Style: every part is a sticker drawn like the avatar (thick ink outline, cream
 fill, hard shadow); trophies are ink-drawn cups standing on a shelf. Parts are separated by a
@@ -25,6 +25,9 @@ SHADOW = 10
 MARGIN = 48
 PROJECT_HEIGHT = 214
 SHELF_TOP = 250
+# Transparent band above the trophy panel: GitHub stacks the two images with a
+# few pixels between them anyway, so the gap is made wide enough to look meant.
+PANEL_GAP = 18
 PLANK = 24
 STATS = Path(__file__).parent / "stats.json"
 # Cup colour, letter colour and size for each rank: gold, silver, bronze, not earned yet.
@@ -163,7 +166,19 @@ def project_body(fonts: Fonts, project: dict) -> str:
             + lines + text(fonts.regular, project["footer"], left, 182, 18, PAPER_MUTED))
 
 
+def panel(parts: list[str], height: float, label: str, top_gap: float = 0) -> str:
+    """Brown rounded panel with an ink frame; `top_gap` leaves a transparent band above it."""
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {height + top_gap}" width="{WIDTH}" height="{height + top_gap}" role="img" aria-label="{escape(label)}">'
+            f'<g transform="translate(0 {top_gap})">'
+            f'<rect x="{STROKE / 2}" y="{STROKE / 2}" width="{WIDTH - STROKE}" height="{height - STROKE}" rx="28" fill="{BG}"/>'
+            f'<clipPath id="page"><rect width="{WIDTH}" height="{height}" rx="28"/></clipPath>'
+            f'<g clip-path="url(#page)">{"".join(parts)}</g>'
+            f'<rect x="{STROKE / 2}" y="{STROKE / 2}" width="{WIDTH - STROKE}" height="{height - STROKE}" rx="28" fill="none" stroke="{INK}" stroke-width="{STROKE + 1}"/>'
+            '</g></svg>\n')
+
+
 def build_profile(stats: dict) -> str:
+    """Top panel: banner and projects."""
     fonts = Fonts()
     projects = [{**p, "state": stats["releases"].get(p["repo"], "live")} for p in PROJECTS]
     banner = build().replace("<svg ", '<svg x="0" y="0" ', 1)
@@ -175,27 +190,26 @@ def build_profile(stats: dict) -> str:
     for project in projects:
         parts.append(sticker(y, PROJECT_HEIGHT, project_body(fonts, project)))
         y += PROJECT_HEIGHT + 44
-    y += 46
-    parts.append(separator(fonts, "trophies", y))
-    y += 76
-    parts.append(trophies(fonts, y, stats["trophies"]))
-    y += SHELF_TOP + PLANK + 80
-    height = y
     label = ("lystriq: i build clean tools, games and apps that work and that people use. projects: "
-             + " ".join(f"{p['name']} ({p['state']}): {' '.join(p['lines'])}" for p in projects)
-             + " trophies: " + ", ".join(f"{t['name']} {t['rank']}" for t in stats["trophies"]) + ".")
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {height}" width="{WIDTH}" height="{height}" role="img" aria-label="{escape(label)}">'
-            f'<rect x="{STROKE / 2}" y="{STROKE / 2}" width="{WIDTH - STROKE}" height="{height - STROKE}" rx="28" fill="{BG}"/>'
-            f'<clipPath id="page"><rect width="{WIDTH}" height="{height}" rx="28"/></clipPath>'
-            f'<g clip-path="url(#page)">{"".join(parts)}</g>'
-            f'<rect x="{STROKE / 2}" y="{STROKE / 2}" width="{WIDTH - STROKE}" height="{height - STROKE}" rx="28" fill="none" stroke="{INK}" stroke-width="{STROKE + 1}"/>'
-            '</svg>\n')
+             + " ".join(f"{p['name']} ({p['state']}): {' '.join(p['lines'])}" for p in projects))
+    return panel(parts, y + 6, label)
+
+
+def build_trophies(stats: dict) -> str:
+    """Bottom panel: the trophy shelf, a separate image so it can link elsewhere."""
+    fonts = Fonts()
+    parts = [separator(fonts, "trophies", 70), trophies(fonts, 146, stats["trophies"])]
+    label = "trophies: " + ", ".join(f"{t['name']} {t['rank']} ({t['title']})" for t in stats["trophies"]) + "."
+    return panel(parts, 146 + SHELF_TOP + PLANK + 80, label, top_gap=PANEL_GAP)
 
 
 def main() -> None:
-    """Usage: make_profile.py <output.svg> [stats.json]"""
-    stats_path = Path(sys.argv[2]) if len(sys.argv) > 2 else STATS
-    Path(sys.argv[1]).write_text(build_profile(json.loads(stats_path.read_text())))
+    """Usage: make_profile.py <profile.svg> <trophies.svg> [stats.json]"""
+    if len(sys.argv) < 3:
+        raise SystemExit(main.__doc__)
+    stats = json.loads((Path(sys.argv[3]) if len(sys.argv) > 3 else STATS).read_text())
+    Path(sys.argv[1]).write_text(build_profile(stats))
+    Path(sys.argv[2]).write_text(build_trophies(stats))
 
 
 if __name__ == "__main__":

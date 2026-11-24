@@ -22,15 +22,15 @@ jobs:
       - run: python tools/stats.py
         env:
           GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN }}
-      - run: python tools/make_profile.py assets/profile.svg
+      - run: python tools/make_profile.py assets/profile.svg assets/trophies.svg
       - name: Commit only if the image changed
         run: |
-          if [ -z "$(git status --porcelain assets/profile.svg tools/stats.json)" ]; then
+          if [ -z "$(git status --porcelain assets/profile.svg assets/trophies.svg tools/stats.json)" ]; then
             echo "profile unchanged"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/profile.svg tools/stats.json
+          git add assets/profile.svg assets/trophies.svg tools/stats.json
           git commit -m "Update profile stats"
           git push
