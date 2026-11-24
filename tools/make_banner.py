@@ -13,8 +13,8 @@ from PIL import Image, ImageFilter
 
 HERE = Path(__file__).parent
 AVATAR = HERE / "assets/avatar-black.png"
-FONT_BOLD = HERE / "fonts/JetBrainsMono-Bold.ttf"
-FONT_REGULAR = HERE / "fonts/JetBrainsMono-Regular.ttf"
+FONT_BOLD = HERE / "fonts/Fredoka-SemiBold.ttf"
+FONT_REGULAR = HERE / "fonts/Fredoka-Regular.ttf"
 
 WIDTH, HEIGHT = 1200, 360
 BG = "#AA601F"
@@ -86,10 +86,10 @@ def build() -> str:
     bold = TTFont(FONT_BOLD)
     regular = TTFont(FONT_REGULAR)
     text_x = 440
-    name_d, name_end = text_path(bold, "lystriq", text_x, 128, 80)
+    name_d, name_end = text_path(bold, "lystriq", text_x, 130, 92)
     phrase = ["i build clean tools,", "games and apps that work", "and that people use."]
-    lines = [text_path(regular, line, text_x, 188 + i * 34, 25)[0] for i, line in enumerate(phrase)]
-    tags, _ = text_path(regular, "19 · paris · station f · 42", text_x, 314, 20)
+    lines = [text_path(regular, line, text_x, 190 + i * 38, 30)[0] for i, line in enumerate(phrase)]
+    tags, _ = text_path(regular, "19 · paris · station f · 42", text_x, 316, 24)
     image = avatar_base64(720)
     left_lid = eyelid_base64(405, 506, 76, 69)
     right_lid = eyelid_base64(591, 506, 50, 68)

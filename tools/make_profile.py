@@ -36,7 +36,7 @@ SILVER = (PAPER, INK, 0.9)
 BRONZE = (PAPER_MUTED, PAPER, 0.82)
 RANK_LOOK = {"SECRET": GOLD, "SSS": GOLD, "SS": GOLD, "S": GOLD, "AAA": SILVER, "AA": SILVER, "A": SILVER,
              "B": BRONZE, "C": BRONZE, "?": BRONZE}
-LETTER_SIZE = {1: 48, 2: 38, 3: 30}
+LETTER_SIZE = {1: 54, 2: 44, 3: 34}
 
 PROJECTS = [
     {
@@ -66,22 +66,22 @@ def separator(fonts: Fonts, label: str, y: float) -> str:
     """Hand-drawn wave across the page with a tilted label on it."""
     waves = (WIDTH - 2 * MARGIN) // 50
     wave = f"M{MARGIN} {y} " + " ".join(f"q 25 {-14 if i % 2 else 14} 50 0" for i in range(waves))
-    width = len(label) * 32 * 0.6 + 52
+    width = text_path(fonts.bold, label, 0, 0, 36)[1] + 52
     x = MARGIN + 60
     return (f'<path d="{wave}" fill="none" stroke="{INK}" stroke-width="{STROKE}" stroke-linecap="round"/>'
             f'<g transform="rotate(-4 {x + width / 2} {y})">'
             f'<rect x="{x}" y="{y - 31}" width="{width:.1f}" height="62" rx="10" fill="{ACCENT}" stroke="{INK}" stroke-width="{STROKE}"/>'
-            f'{text(fonts.bold, label, x + 26, y + 11, 32, INK)}</g>')
+            f'{text(fonts.bold, label, x + 26, y + 12, 36, INK)}</g>')
 
 
 def state_pill(fonts: Fonts, state: str, right: float, baseline: float) -> str:
-    width = len(state) * 22 * 0.6 + 36
+    width = text_path(fonts.bold, state, 0, 0, 24)[1] + 36
     x = right - width
     if state == "live" or state.startswith("v"):
         return (f'<rect x="{x:.1f}" y="{baseline - 28}" width="{width:.1f}" height="38" rx="19" fill="{ACCENT}" stroke="{INK}" stroke-width="3"/>'
-                + text(fonts.regular, state, x + 18, baseline, 22, INK))
+                + text(fonts.bold, state, x + 18, baseline, 24, INK))
     return (f'<rect x="{x:.1f}" y="{baseline - 28}" width="{width:.1f}" height="38" rx="19" fill="none" stroke="{PAPER_MUTED}" stroke-width="2.5"/>'
-            + text(fonts.regular, state, x + 18, baseline, 22, PAPER_MUTED))
+            + text(fonts.bold, state, x + 18, baseline, 24, PAPER_MUTED))
 
 
 def centered(font: TTFont, value: str, cx: float, y: float, size: float, fill: str) -> str:
@@ -121,10 +121,10 @@ def sparkle(x: float, y: float, size: float) -> str:
 
 def plaque(fonts: Fonts, name: str) -> str:
     """Dark name plate under a cup, sized to its text, bottom on y = 0."""
-    width = text_path(fonts.bold, name, 0, 0, 17)[1] + 30
+    width = text_path(fonts.bold, name, 0, 0, 20)[1] + 30
     return (f'<rect x="{-width / 2 + 6}" y="-32" width="{width}" height="38" rx="7" fill="{INK}"/>'
             f'<rect x="{-width / 2}" y="-38" width="{width}" height="38" rx="7" fill="{INK}" stroke="{TERM_BAR}" stroke-width="2"/>'
-            + centered(fonts.bold, name, 0, -13, 17, PAPER))
+            + centered(fonts.bold, name, 0, -12, 20, PAPER))
 
 
 def trophy(fonts: Fonts, rank: str, name: str, cx: float, shelf: float) -> str:
@@ -145,8 +145,8 @@ def trophies(fonts: Fonts, y: float, earned: list[dict]) -> str:
     plank = (f'<rect x="{left + SHADOW}" y="{shelf + SHADOW}" width="{right - left}" height="{PLANK}" rx="6" fill="{INK}"/>'
              f'<rect x="{left}" y="{shelf}" width="{right - left}" height="{PLANK}" rx="6" fill="{TERM_BAR}" stroke="{INK}" stroke-width="{STROKE}"/>')
     cups = "".join(trophy(fonts, t["rank"], t["name"], MARGIN + step * (i + 0.5), shelf) for i, t in enumerate(earned))
-    captions = "".join(centered(fonts.bold, t["value"], MARGIN + step * (i + 0.5), shelf + PLANK + 44, 21, PAPER)
-                       + centered(fonts.regular, t["title"], MARGIN + step * (i + 0.5), shelf + PLANK + 72, 17, MUTED)
+    captions = "".join(centered(fonts.bold, t["value"], MARGIN + step * (i + 0.5), shelf + PLANK + 46, 25, PAPER)
+                       + centered(fonts.regular, t["title"], MARGIN + step * (i + 0.5), shelf + PLANK + 76, 20, MUTED)
                        for i, t in enumerate(earned))
     return plank + cups + captions
 
@@ -160,11 +160,11 @@ def logo(path: Path, x: float, y: float, size: float) -> str:
 def project_body(fonts: Fonts, project: dict) -> str:
     inner = WIDTH - 2 * MARGIN - SHADOW
     left = 196
-    lines = "".join(text(fonts.regular, line, left, 114 + i * 32, 20, PAPER_TEXT) for i, line in enumerate(project["lines"]))
+    lines = "".join(text(fonts.regular, line, left, 114 + i * 34, 24, PAPER_TEXT) for i, line in enumerate(project["lines"]))
     return (logo(project["logo"], 36, 40, 134)
-            + text(fonts.bold, project["name"], left, 72, 40, INK)
+            + text(fonts.bold, project["name"], left, 74, 46, INK)
             + state_pill(fonts, project["state"], inner - 36, 66)
-            + lines + text(fonts.regular, project["footer"], left, 182, 18, PAPER_MUTED))
+            + lines + text(fonts.regular, project["footer"], left, 186, 21, PAPER_MUTED))
 
 
 def panel(parts: list[str], height: float, label: str, top_gap: float = 0) -> str:
