@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 
-from stats import COMMITS, EXPERIENCE, PULL_REQUESTS, REPOSITORIES, build_stats, experience_score, ranked
+from stats import COMMITS, EXPERIENCE, PULL_REQUESTS, REPOSITORIES, build_stats, experience_score, ranked, rounded
 
 
 def test_rank_uses_the_best_threshold_reached() -> None:
@@ -38,4 +38,9 @@ def test_build_stats_adds_private_commits_and_skips_missing_releases() -> None:
     assert scores["commits"] == 1100
     assert stats["releases"] == {}
     assert [t["rank"] for t in stats["trophies"]] == ["S", "C", "C", "C"]
-    assert [t["value"] for t in stats["trophies"]] == ["1,100 in 12 months", "since 2025", "9 opened", "3 owned"]  # experience: 365 days -> 3, C from 2
+    assert [t["value"] for t in stats["trophies"]] == ["1,100 in 12 months", "since 2025", "9 opened", "3 owned"]
+
+
+def test_shown_numbers_keep_two_figures_rounded_down() -> None:
+    assert [rounded(n) for n in (0, 17, 99, 100, 126, 999, 1192, 1200, 12345)] == [
+        "0", "17", "99", "100", "120+", "990+", "1,100+", "1,200", "12,000+"]  # experience: 365 days -> 3, C from 2

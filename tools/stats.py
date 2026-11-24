@@ -84,6 +84,18 @@ def experience_score(user: dict, now: datetime) -> int:
     return math.floor((now - earliest_date(user)).total_seconds() / 86400 / 100)
 
 
+def rounded(count: int) -> str:
+    """Two significant figures, rounded down, "+" when cut: 17, 120+, 1,100+.
+
+    Shown numbers change rarely, so the daily job seldom has anything to commit.
+    """
+    if count < 100:
+        return str(count)
+    step = 10 ** (len(str(count)) - 2)
+    floor = count // step * step
+    return f"{floor:,}+" if floor != count else f"{count:,}"
+
+
 def ranked(name: str, score: int, table: list[tuple[str, str, int]], value: str) -> dict:
     """Trophy as the profile shows it; `value` is the number behind it, written for people."""
     for rank, title, minimum in table:
@@ -105,10 +117,10 @@ def build_stats(data: dict, now: datetime) -> tuple[dict, dict]:
     tables = {"commits": COMMITS, "experience": EXPERIENCE, "pull requests": PULL_REQUESTS, "repositories": REPOSITORIES}
     # Commit contributions cover the last 12 months (GitHub's default window).
     values = {
-        "commits": f"{scores['commits']:,} in 12 months",
+        "commits": f"{rounded(scores['commits'])} in 12 months",
         "experience": f"since {earliest_date(user).year}",
-        "pull requests": f"{scores['pull requests']:,} opened",
-        "repositories": f"{scores['repositories']:,} owned",
+        "pull requests": f"{rounded(scores['pull requests'])} opened",
+        "repositories": f"{rounded(scores['repositories'])} owned",
     }
     releases = {repo: data[f"r{i}"]["latestRelease"]["tagName"]
                 for i, repo in enumerate(RELEASE_REPOS) if data[f"r{i}"] and data[f"r{i}"]["latestRelease"]}
