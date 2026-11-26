@@ -1,6 +1,6 @@
 {
   "releases": {
-    "kindric": "v0.5.0"
+    "kindric": "v1.0.0"
   },
   "trophies": [
     {
@@ -19,13 +19,13 @@
       "rank": "AAA",
       "name": "pull requests",
       "title": "ultra puller",
-      "value": "140+ opened"
+      "value": "150+ opened"
     },
     {
       "rank": "B",
       "name": "repositories",
       "title": "middle repo creator",
-      "value": "17 owned"
+      "value": "18 owned"
     }
   ]
 }
